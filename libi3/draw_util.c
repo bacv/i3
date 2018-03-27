@@ -168,6 +168,33 @@ void draw_util_rectangle(surface_t *surface, color_t color, double x, double y, 
 }
 
 /**
+ * Draws a filled rectangle.
+ * This function is a convenience wrapper and takes care of flushing the
+ * surface as well as restoring the cairo state.
+ *
+ */
+ void draw_util_circle(surface_t *surface, color_t color, double x, double y, double w, double h) {
+    RETURN_UNLESS_SURFACE_INITIALIZED(surface);
+
+    cairo_save(surface->cr);
+    
+    /* Using the SOURCE operator will copy both color and alpha information directly
+     * onto the surface rather than blending it. This is a bit more efficient and
+     * allows better color control for the user when using opacity. */
+    cairo_set_operator(surface->cr, CAIRO_OPERATOR_SOURCE);
+    draw_util_set_source_color(surface, color);
+
+    /* Using h as r */
+    cairo_translate(surface->cr, x - h / 2, y - h / 2);
+    cairo_scale(surface->cr, h / 2.0, h / 2.0);
+    cairo_arc(surface->cr, 0.0, 0.0, 1.0, 0.0, 2 * G_PI);
+  
+    CAIRO_SURFACE_FLUSH(surface->surface);
+
+    cairo_restore(surface->cr);
+ }
+
+/**
  * Clears a surface with the given color.
  *
  */
